@@ -1,9 +1,9 @@
 package events
 
 type Event struct {
-	id          uint
-	title       string
-	date        string
-	status      bool
-	description string
+	ID          uint   `json:"id"`
+	Title       string `json:"Title"`
+	Date        string `json:"Date"`
+	Status      bool   `json:"Status"`
+	Description string `json:"Description"`
 }

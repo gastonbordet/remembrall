@@ -2,36 +2,36 @@ package events
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
-	"time"
 )
 
 type IEventsHandler interface {
-	GetEvents(w http.ResponseWriter, r *http.Request)
+	GetAll(w http.ResponseWriter, r *http.Request)
 }
 
 type EventsHandler struct {
+	service IEventsService
 }
 
-func BuildEventsHandler() *EventsHandler {
-	eventsHandler := &EventsHandler{}
+func BuildEventsHandler(eventsService IEventsService) *EventsHandler {
+	eventsHandler := &EventsHandler{
+		service: eventsService,
+	}
 	return eventsHandler
 }
 
-func (handler *EventsHandler) GetEvents(w http.ResponseWriter, r *http.Request) {
-	event := &Event{
-		id:          1,
-		title:       "Test event",
-		date:        time.Now().Format("2006-01-02"),
-		status:      true,
-		description: "Event for testing",
+func (handler *EventsHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+	events, eventsErr := handler.service.GetAll()
+
+	if eventsErr != nil {
+		log.Fatalf("Error happened at service.GetAll. Error: %s", eventsErr)
 	}
 
-	response, marshalErr := json.Marshal(event)
+	response, err := json.Marshal(events)
 
-	if marshalErr != nil {
-		fmt.Println("Marshal error")
+	if err != nil {
+		log.Fatalf("Error happened in Events JSON marshal. Error: %s", err)
 	}
 
 	w.Write(response)

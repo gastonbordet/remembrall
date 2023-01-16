@@ -10,7 +10,7 @@ import (
 func InitRouter(events_handler events.IEventsHandler) http.Handler {
 	r := chi.NewRouter()
 	r.Route("/events", func(r chi.Router) {
-		r.Get("/", events_handler.GetEvents)
+		r.Get("/", events_handler.GetAll)
 	})
 
 	return r

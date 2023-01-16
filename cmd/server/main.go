@@ -13,7 +13,8 @@ type ServerConfig struct {
 }
 
 func startServer(config *ServerConfig) {
-	events_handlers := events.BuildEventsHandler()
+	events_service := events.BuildEventsService()
+	events_handlers := events.BuildEventsHandler(events_service)
 
 	handler := rest.InitRouter(events_handlers)
 	fmt.Println(fmt.Sprintf("Start app on port: %d", config.port))
