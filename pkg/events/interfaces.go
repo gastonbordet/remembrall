@@ -1,6 +1,9 @@
 package events
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
 type IEventsHandler interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
@@ -8,6 +11,6 @@ type IEventsHandler interface {
 }
 
 type IEventsService interface {
-	GetAll() ([]Event, error)
-	GetByEventID(eventID string) (*Event, error)
+	GetAll(ctx context.Context) ([]Event, error)
+	GetByEventID(ctx context.Context, eventID string) (*Event, error)
 }

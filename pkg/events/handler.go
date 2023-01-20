@@ -2,7 +2,6 @@ package events
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -18,35 +17,35 @@ func BuildEventsHandler(eventsService IEventsService) *EventsHandler {
 }
 
 func (handler *EventsHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	events, eventsErr := handler.service.GetAll()
-
-	if eventsErr != nil {
-		log.Fatalf("Error happened at service.GetAll. Error: %s", eventsErr)
-	}
-
-	response, err := json.Marshal(events)
+	ctx := r.Context()
+	events, err := handler.service.GetAll(ctx)
 
 	if err != nil {
-		log.Fatalf("Error happened in Events JSON marshal. Error: %s", err)
+		webErr := handleError(ctx, "", err)
+		w.WriteHeader(webErr.Status)
 	}
 
+	response, _ := json.Marshal(events)
 	w.Write(response)
 }
 
 func (handler *EventsHandler) GetByEventID(w http.ResponseWriter, r *http.Request) {
 	// TODO get eventID from url query param
-	eventID := ""
-	event, eventErr := handler.service.GetByEventID(eventID)
+	ctx := r.Context()
+	eventID := "1"
 
-	if eventErr != nil {
-		log.Fatalf("Error happened at service.GetAll. Error: %s", eventErr)
+	if eventID == "" {
+		// 400 Bad request error
 	}
 
-	response, err := json.Marshal(event)
+	event, err := handler.service.GetByEventID(ctx, eventID)
 
 	if err != nil {
-		log.Fatalf("Error happened in Events JSON marshal. Error: %s", err)
+		// 404 error
+		handleError(ctx, eventID, err)
 	}
+
+	response, _ := json.Marshal(event)
 
 	w.Write(response)
 }
