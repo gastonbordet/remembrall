@@ -25,6 +25,11 @@ func (mock *MockEventsService) GetAll(ctx context.Context) ([]events.Event, erro
 
 func (mock *MockEventsService) GetByEventID(ctx context.Context, eventID string) (*events.Event, error) {
 	args := mock.Called()
+
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+
 	mock_event := args.Get(0).(events.Event)
 
 	return &mock_event, args.Error(1)
@@ -93,4 +98,48 @@ func TestGetAllInternalError(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Empty(t, response)
 	assert.Equal(t, w.Code, http.StatusInternalServerError)
+}
+
+func TestGetByIDOk(t *testing.T) {
+	// Setup
+	var response *events.Event
+	event_response := &events.Event{
+		ID:          1,
+		Title:       "test",
+		Description: "test",
+		Date:        "",
+		Status:      true,
+	}
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("GET", "/events/1", nil)
+	eventsService := &MockEventsService{}
+	eventsService.On("GetByEventID").Return(*event_response, nil)
+	eventsHandler := events.BuildEventsHandler(eventsService)
+
+	// Act
+	eventsHandler.GetByEventID(w, r)
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+
+	// Assert
+	assert.Nil(t, err)
+	assert.Equal(t, "test", response.Title)
+}
+
+func TestGetByIDNotFound(t *testing.T) {
+	// Setup
+	var response *events.Event
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest("GET", "/events/1", nil)
+	eventsService := &MockEventsService{}
+	eventsService.On("GetByEventID").Return(nil, events.EventNotFoundError)
+	eventsHandler := events.BuildEventsHandler(eventsService)
+
+	// Act
+	eventsHandler.GetByEventID(w, r)
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+
+	// Assert
+	assert.Nil(t, err)
+	assert.Nil(t, response)
+	assert.Equal(t, http.StatusNotFound, w.Code)
 }

@@ -19,25 +19,24 @@ func BuildEventsService() *EventsService {
 }
 
 func (service *EventsService) GetAll(ctx context.Context) ([]Event, error) {
-	// events := []Event{
-	// 	{
-	// 		ID:          1,
-	// 		Title:       "Test event 1",
-	// 		Date:        time.Now().Format("2006-01-02"),
-	// 		Status:      true,
-	// 		Description: "Event for testing",
-	// 	},
-	// 	{
-	// 		ID:          2,
-	// 		Title:       "Test event 2",
-	// 		Date:        time.Now().Format("2006-01-02"),
-	// 		Status:      true,
-	// 		Description: "Event for testing",
-	// 	},
-	// }
+	events := []Event{
+		{
+			ID:          1,
+			Title:       "Test event 1",
+			Date:        time.Now().Format("2006-01-02"),
+			Status:      true,
+			Description: "Event for testing",
+		},
+		{
+			ID:          2,
+			Title:       "Test event 2",
+			Date:        time.Now().Format("2006-01-02"),
+			Status:      true,
+			Description: "Event for testing",
+		},
+	}
 
-	//return events, nil
-	return []Event{}, EventInternalError
+	return events, nil
 }
 
 func (service *EventsService) GetByEventID(ctx context.Context, eventID string) (*Event, error) {

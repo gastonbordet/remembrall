@@ -41,11 +41,10 @@ func (handler *EventsHandler) GetByEventID(w http.ResponseWriter, r *http.Reques
 	event, err := handler.service.GetByEventID(ctx, eventID)
 
 	if err != nil {
-		// 404 error
-		handleError(ctx, eventID, err)
+		webErr := handleError(ctx, eventID, err)
+		w.WriteHeader(webErr.Status)
 	}
 
 	response, _ := json.Marshal(event)
-
 	w.Write(response)
 }
