@@ -1,4 +1,4 @@
-package router
+package rest
 
 import (
 	"net/http"
@@ -10,7 +10,8 @@ import (
 func InitRouter(events_handler events.IEventsHandler) http.Handler {
 	r := chi.NewRouter()
 	r.Route("/events", func(r chi.Router) {
-		r.Get("/", events_handler.GetEvents)
+		r.Get("/", events_handler.GetAll)
+		r.Get("/{eventID}", events_handler.GetByEventID)
 	})
 
 	return r

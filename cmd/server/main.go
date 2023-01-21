@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gastonbordet/remembrall/pkg/events"
-	"github.com/gastonbordet/remembrall/pkg/http/router"
+	"github.com/gastonbordet/remembrall/pkg/http/rest"
 )
 
 type ServerConfig struct {
@@ -13,9 +13,10 @@ type ServerConfig struct {
 }
 
 func startServer(config *ServerConfig) {
-	events_handlers := events.BuildEventsHandler()
+	events_service := events.BuildEventsService()
+	events_handlers := events.BuildEventsHandler(events_service)
 
-	handler := router.InitRouter(events_handlers)
+	handler := rest.InitRouter(events_handlers)
 	fmt.Println(fmt.Sprintf("Start app on port: %d", config.port))
 	http.ListenAndServe(fmt.Sprintf(":%d", config.port), handler)
 }
