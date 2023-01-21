@@ -9,7 +9,7 @@ import (
 	web "github.com/gastonbordet/remembrall/pkg/web/error"
 )
 
-func handleError(ctx context.Context, eventID string, err error) *web.WebError {
+func HandleError(ctx context.Context, eventID string, err error) *web.WebError {
 	code := http.StatusInternalServerError
 	msg := fmt.Sprintf("Events Internal error: %s", err.Error())
 
@@ -20,7 +20,7 @@ func handleError(ctx context.Context, eventID string, err error) *web.WebError {
 
 	if errors.Is(err, EventInternalError) {
 		code = http.StatusInternalServerError
-		msg = fmt.Sprintf("Event %s internal error.", eventID)
+		msg = fmt.Sprintf("Event %s generated internal error.", eventID)
 	}
 
 	return web.NewWebError(code, msg)

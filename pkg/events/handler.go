@@ -21,7 +21,7 @@ func (handler *EventsHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	events, err := handler.service.GetAll(ctx)
 
 	if err != nil {
-		webErr := handleError(ctx, "", err)
+		webErr := HandleError(ctx, "", err)
 		w.WriteHeader(webErr.Status)
 	}
 
@@ -41,7 +41,7 @@ func (handler *EventsHandler) GetByEventID(w http.ResponseWriter, r *http.Reques
 	event, err := handler.service.GetByEventID(ctx, eventID)
 
 	if err != nil {
-		webErr := handleError(ctx, eventID, err)
+		webErr := HandleError(ctx, eventID, err)
 		w.WriteHeader(webErr.Status)
 	}
 
