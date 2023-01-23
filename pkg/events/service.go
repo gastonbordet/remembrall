@@ -2,51 +2,32 @@ package events
 
 import (
 	"context"
-	"errors"
-	"time"
 )
 
-var (
-	EventNotFoundError = errors.New("event not found")
-	EventInternalError = errors.New("event internal error")
-)
+type IEventsService interface {
+	GetAll(ctx context.Context) ([]Event, error)
+	GetByEventID(ctx context.Context, eventID uint) (*Event, error)
+}
 
-type EventsService struct{}
+type EventsService struct {
+	Repository IEventsRepository
+}
 
-func BuildEventsService() *EventsService {
-	service := &EventsService{}
+func BuildEventsService(eventsRepository IEventsRepository) *EventsService {
+	service := &EventsService{
+		Repository: eventsRepository,
+	}
 	return service
 }
 
 func (service *EventsService) GetAll(ctx context.Context) ([]Event, error) {
-	events := []Event{
-		{
-			ID:          1,
-			Title:       "Test event 1",
-			Date:        time.Now().Format("2006-01-02"),
-			Status:      true,
-			Description: "Event for testing",
-		},
-		{
-			ID:          2,
-			Title:       "Test event 2",
-			Date:        time.Now().Format("2006-01-02"),
-			Status:      true,
-			Description: "Event for testing",
-		},
-	}
+	events, err := service.Repository.GetAll(ctx)
 
-	return events, nil
+	return events, err
 }
 
-func (service *EventsService) GetByEventID(ctx context.Context, eventID string) (*Event, error) {
-	event := &Event{
-		ID:          1,
-		Title:       "Test event 1",
-		Date:        time.Now().Format("2006-01-02"),
-		Status:      true,
-		Description: "Event for testing",
-	}
+func (service *EventsService) GetByEventID(ctx context.Context, eventID uint) (*Event, error) {
+	event, err := service.Repository.GetByEventID(ctx, eventID)
 
-	return event, nil
+	return event, err
 }

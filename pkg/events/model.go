@@ -1,6 +1,8 @@
 package events
 
-import "time"
+import (
+	"time"
+)
 
 const (
 	title_max_length       = 30
@@ -9,10 +11,11 @@ const (
 )
 
 type Event struct {
-	ID          uint   `json:"id"`
+	//gorm.Model
+	ID          uint   `json:"id" gorm:"primaryKey; not null; autoIncrement"`
 	Title       string `json:"Title"`
 	Date        string `json:"Date"`
-	Status      bool   `json:"Status"`
+	Status      bool   `json:"Status" gorm:"not null; default:true"`
 	Description string `json:"Description"`
 }
 
