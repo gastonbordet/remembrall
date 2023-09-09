@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gastonbordet/remembrall/cmd/util"
+
 	"github.com/gastonbordet/remembrall/pkg/events"
 	"github.com/gastonbordet/remembrall/pkg/http/rest"
 	"github.com/gastonbordet/remembrall/pkg/storage/database"
@@ -14,8 +16,13 @@ type ServerConfig struct {
 }
 
 func startServer(config *ServerConfig) {
+	envConfig, errConfig := util.LoadConfig(".", "config", "env")
+	if errConfig != nil {
+		fmt.Println("Error reading env configuration, err: ", errConfig)
+	}
+	fmt.Println("env: ", envConfig)
 	sqlClient := database.NewSQLClient()
-	sqlConn, sqlErr := sqlClient.OpenConnection(database.GenerateMysqlURIConnection())
+	sqlConn, sqlErr := sqlClient.OpenConnection(database.GenerateMysqlURIConnection(envConfig))
 
 	if sqlErr != nil {
 		return

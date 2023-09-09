@@ -1,6 +1,9 @@
 package database
 
 import (
+	"fmt"
+
+	"github.com/gastonbordet/remembrall/cmd/util"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -26,8 +29,17 @@ func (c *SqlClient) OpenConnection(uriConn string) (*gorm.DB, error) {
 	return db, nil
 }
 
-func GenerateMysqlURIConnection() string {
-	uri := "remembrall_user:remembrall_pwd@tcp(127.0.0.1:3306)/remembrall_dev"
+func GenerateMysqlURIConnection(
+	config *util.Config,
+) string {
+	uri := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s",
+		config.DB_USER,
+		config.DB_PWD,
+		config.DB_ADDRESS,
+		config.DB_PORT,
+		config.DB_NAME,
+	)
 
 	return uri
 }
