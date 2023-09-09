@@ -1,9 +1,20 @@
 package events
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
+	"strconv"
+
+	web "github.com/gastonbordet/remembrall/pkg/web/error"
 )
+
+type IEventsHandler interface {
+	GetAll(w http.ResponseWriter, r *http.Request)
+	GetByEventID(w http.ResponseWriter, r *http.Request)
+}
 
 type EventsHandler struct {
 	service IEventsService
@@ -35,10 +46,18 @@ func (handler *EventsHandler) GetByEventID(w http.ResponseWriter, r *http.Reques
 	eventID := "1"
 
 	if eventID == "" {
-		// 400 Bad request error
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	event, err := handler.service.GetByEventID(ctx, eventID)
+	eventIDParsed, idParseErr := strconv.ParseUint(eventID, 10, 32)
+
+	if idParseErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	event, err := handler.service.GetByEventID(ctx, uint(eventIDParsed))
 
 	if err != nil {
 		webErr := HandleError(ctx, eventID, err)
@@ -47,4 +66,21 @@ func (handler *EventsHandler) GetByEventID(w http.ResponseWriter, r *http.Reques
 
 	response, _ := json.Marshal(event)
 	w.Write(response)
+}
+
+func HandleError(ctx context.Context, eventID string, err error) *web.WebError {
+	code := http.StatusInternalServerError
+	msg := fmt.Sprintf("Events Internal error: %s", err.Error())
+
+	if errors.Is(err, EventNotFoundError) {
+		code = http.StatusNotFound
+		msg = fmt.Sprintf("Event %s not found.", eventID)
+	}
+
+	if errors.Is(err, EventInternalError) {
+		code = http.StatusInternalServerError
+		msg = fmt.Sprintf("Event %s generated internal error.", eventID)
+	}
+
+	return web.NewWebError(code, msg)
 }
