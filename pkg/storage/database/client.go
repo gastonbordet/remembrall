@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 
-	"github.com/gastonbordet/remembrall/cmd/util"
+	"github.com/gastonbordet/remembrall/pkg/util/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -30,7 +30,7 @@ func (c *SqlClient) OpenConnection(uriConn string) (*gorm.DB, error) {
 }
 
 func GenerateMysqlURIConnection(
-	config *util.Config,
+	config *config.Config,
 ) string {
 	uri := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s",
