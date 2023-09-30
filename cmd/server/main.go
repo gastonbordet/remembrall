@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gastonbordet/remembrall/pkg/util/config"
-	"github.com/gastonbordet/remembrall/pkg/util/logs"
+	"github.com/gastonbordet/remembrall/pkg/util/logger"
 
 	"github.com/gastonbordet/remembrall/pkg/events"
 	"github.com/gastonbordet/remembrall/pkg/http/rest"
@@ -17,11 +17,11 @@ type ServerConfig struct {
 }
 
 func startServer(serverConfig *ServerConfig) {
-	logs.InitZapLogger()
+	logger.Info("Server starting ...")
 	envConfig, errConfig := config.LoadConfig(".", "config", "env")
 
 	if errConfig != nil {
-		logs.Logger.Error(fmt.Sprintf("Error reading env configuration, err: %v", errConfig))
+		logger.Error(fmt.Sprintf("Error reading env configuration, err: %v", errConfig))
 	}
 
 	sqlClient := database.NewSQLClient()
@@ -36,7 +36,7 @@ func startServer(serverConfig *ServerConfig) {
 	events_handlers := events.BuildEventsHandler(events_service)
 
 	handler := rest.InitRouter(events_handlers)
-	logs.Logger.Info(fmt.Sprintf("Start app on port: %d", serverConfig.port))
+	logger.Info(fmt.Sprintf("App running on port: %d", serverConfig.port))
 	http.ListenAndServe(fmt.Sprintf(":%d", serverConfig.port), handler)
 }
 
